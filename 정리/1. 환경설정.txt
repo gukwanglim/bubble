@@ -1,0 +1,20 @@
+AWT 라이브러리(java에서 그림을 그릴 수 있게 해주는 라이브러리)
+    : 윈도우창(JFrame) 안에 그림을 그릴 수 있는 JPanel이 존재한다.
+
+    JFrame은 while 문으로 계속 돌면서 윈도우창이 나오게 된다.
+
+    만약, JPanel에 버튼을 그려 넣을 수 있다고 하여도 버튼의 디자인, 애니메이션 구현 등이 어려우며, 재사용이 불가능해진다.
+    이런 문제를 해결하기 위한 기능이 component(버튼, 이미지뷰, 체크박스, 셀렉트 박스 등이 저장되어 있음)이다.(흔히 위젯이라고 부른다.)
+
+
+1. bubble 프로젝트에서 image, sount 폴더를 생성하여 파일을 저장.(https://github.com/codingspecialist/java-bubble-game-v2)
+    추가로 lib 폴더를 생성하여 lombok 라이브러리 저장.
+
+2. 사진 1번과 같이 Build Path - Configure Build Path에 들어가서 Libraries - Classpath에서 Add JARs에 들어가면 lib에 설치한 lombok을 사용할 수 있도록 설정할 수 있다. (사진 2번)
+    이 과정은 grable, maven을 사용하면 설정할 수 있는 것이지만, 이번 프로젝트에서는 직접 설치하여 사용하기로 한다.
+
+3. lombok을 실행하기 위해서 터미널에 lombok이 존재하는 파일으로 위치를 이동하여 java -jar lombok.jar 를 실행하면 (사진 3번) 사진 4번과 같이 lombok이 실행되는 것을 확인할 수 있다.
+
+4. lombok이 제대로 설치된 것을 확인하기 위해서 사진 5번과 같이 간단한 코드를 작성한다.
+    여기서 lombok이 작동됨을 알 수 있는 부분은 @Getter, @Setter와 같은 어노테이션 부분으로 만약, lombok이 설치되지 않았다면 우클릭 - Source - Generate Getters and Setters 기능을 사용하여 
+    코드로 작성될 수 있도록 만들어야 하는데, 큰 프로젝트에서 이처럼 사용하게 될 경우 코드가 복잡해진다.
