@@ -1,4 +1,7 @@
-package bubble.test.ex02;
+package bubble.test.ex03;
+
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -12,6 +15,7 @@ public class BubbleFrame_2 extends JFrame {
 	public BubbleFrame_2() {
 		initObject();
 		initSetting();
+		initListener();
 		setVisible(true);
 	}
 	
@@ -33,6 +37,33 @@ public class BubbleFrame_2 extends JFrame {
 		setLayout(null);    			 	// absoulte 레이아웃 (자유롭게 그림을 그릴 수 있다.)
 		setLocationRelativeTo(null);		// JFrame 가운데 배치
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);		// x버튼으로 창을 종료할 때, JVM 같이 종료
+	}
+	
+	private void initListener() {
+		addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent e) {
+				System.out.println(e.getKeyCode());
+				
+				switch (e.getKeyCode()) {
+					case KeyEvent.VK_LEFT:
+						player.left();
+						break;
+						
+					case KeyEvent.VK_RIGHT:
+						player.right();
+						break;
+						
+					case KeyEvent.VK_UP:
+						player.up();
+						break;
+						
+//					case KeyEvent.VK_DOWN:
+//						player.down();
+//						break;
+				}
+			}
+		});
 	}
 	
 	public static void main(String[] args) {
