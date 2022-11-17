@@ -1,0 +1,35 @@
+1. bubble의 경우에는 player가 바라보는 방향으로 발사된 후, 위로 올라가게 된다.
+    하지만 player의 움직임처럼 left, right와 up이 동시에 동작하여 대각선으로 움직이는 모습은 보이지 않는다.
+    그렇기 때문에 bubble의 스레드는 한 개만 존재한다.
+    즉, 현재 Bubble 클래스에서 implements로 들고와 사용하고 있는 left, right, up이 동작할 때, 각각의 코드 안에 스레드를 따로 생성할 필요가 없다는 뜻이다.
+
+    다시 말해, left, right, up이 동작하는 것을 하나의 스레드가 처리해야한다.
+    이렇게 만들기 위해서는 먼저 Bubble의 생성자에 initThread()를 넣어줘야 한다.     (사진 1,2번) 
+
+2. 이제 발사한 bubble의 움직임을 만들기 위해 left, right, up에 코드를 추가해야한다.
+    만약, left로 발사한 경우에는 left가 true로 변경되고 for 구문만큼 앞으로 날아가다가 어느 정도 거리에서 up()이 실행되어 위로 올라가게 된다.
+    up에서는 up이 true로 변경되고, while 구문을 통해 위로 올라가는 것을 표현하면 된다.  (사진 3번)
+
+    이렇게 코드가 완성되면 여러 개의 bubble을 생성할수록 게임의 속도가 느려지게 되는데 이유는 버블이 생기는 만큼 스레드를 사용하기 때문이다.
+
+3. bubble의 경우에도 날아가는 도중에 벽을 만나게 되면 바로 up이 실행되야 하고, 맵의 끝까지 올라가게 되면 그 자리에 멈춰 있어야 한다.
+    player의 경우 BackgroundPlayerService 클래스를 생성하여 지켜보고 있다가 벽과 만나는 순간 멈춰 세우지만, 
+    bubble은 bubble 하나 당, 하나의 스레드를 가지고 있기 때문에 player와 같은 방식의 service를 만들게 되면 프로그램이 너무 무거워진다.  
+
+    때문에 bubble이 벽에 충돌하는 상황을 알려주게 되는 코드는 player의 service와 달리 implements Runnable을 하지 않는다.
+    (스레드를 생성하지 않는다. -> player 클래스를 살펴보면 initBackgroundPlayerService()가 실행되면서 스레드를 생성하게 된다. (사진 5번))
+
+    단지 bubble의 service는 벽이 존재하는지의 유무를 판단하게 된다.     (사진 4번)
+    (정확히 표현하자면 계속해서 돌고 있는 코드가 아니기 때문에 service라고 하기에는 애매하지만 일단 service라고 작성했다.)
+
+4. BackgroundBubbleService를 적용시키기 위해 Bubble 클래스에서 BackgroundBubbleService를 가져오고, 오브젝트가 생성될 때마다 새로운 BackgroundBubbleService을 받아온다. (사진 6,7번)
+
+    이제 bubble이 발사되어 left, right 방향으로 움직일 때마다 벽이 존재하는지 감시하기만 하면 된다.     (사진 8번)
+
+    날아간 bubble이 벽에 걸리게 하기 위해서는 이전 player가 벽에 충돌하는 코드를 가져와서 사용한다.
+    단, bubble은 처음 날아가는 한 방향으로만 움직이기 때문에 left, right를 따로 관리해야 한다.      (사진 9번)
+
+    만약, 붉은 벽에 부딪히게 되면 return true만을 하게 구성되어 있는데, 그 이유는 Bubble 클레스에서 벽에 부딪힐 경우 break가 될 수 있도록 코드를 구성했기 때문에
+    true가 return 된다면 if 구문을 통해 break가 실행되기 때문이다.      (사진 10번)
+
+    천장의 경우도 left, right와 같이 코드를 작성하면 된다.  (사진 11번)

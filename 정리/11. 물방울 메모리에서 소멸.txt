@@ -1,0 +1,25 @@
+1. 위로 올라가서 멈추게 된 bubble은 시간이 지나면 소멸되어야 한다.
+    즉, 코드의 순서상 Bubble 클래스에서 up이 동작되고, 벽을 만나 그 자리에 멈추게 되는 순간부터 일정 시간이 흐른 뒤에 소멸되야 한다.    (사진 1번)
+
+    bubble을 소멸시킬 코드 clearBubble()는 사진 2번과 같이 3초가 지난 후에 bomb 이미지로 변경된다.
+    다시 말해, 아직 소멸되지 않은 상태로 bubble의 이미지가 bomb 이미지로 다시 그려진 것이다.        (사진 2번)
+
+    넓게 보자면, 전체 도화지 BubbleFrame 위에 player가 그려지고 player가 bubble을 발사하여 천장에 부딪힌 상태가 모두 그려져 있는 것이다.
+    여기서 bubble의 이미지를 bomb으로 변경한 상태로 bubble 자체를 소멸 시키지 위해서는 BubbleFrame을 다시 그려서 bubble이 존재하지 않는 것으로 그려 놓아야 한다.
+
+    그러기 위해서는 새롭게 다시 그려넣은 도화지인 BubbleFrame을 사용할 수 있어야 하므로 BubbleFrame을 불러온다.     (사진 3번)
+    이렇게 불러왔으면 가장 기본적인 내용을 담은 BubbleFrame(main 함수를 가지고 있다. = 모든 클래스의 위치 정보를 가지고 있다.)를 생성자에서 사용하게 된다.      (사진 4번)
+    (기존 Bubble의 생성자에는 Player player로 받아와 사용했는데 BubbleFrame을 사용할 수 있기 때문에 BubbleFrame_2 mContext를 받아오게 된다.)
+        (이때, this.player = mContext.getPlayer();와 같이 getPlayer()를 사용하기 위해서는 BubbleFrame에선 @Getter, @Setter 어노테이션을 사용해야 한다.)
+
+2. Bubble 클래스에서 BubbleFrame_2 mContext를 받아오게 되므로 기존에 존재하던 BubbleFrame의 키보드 클릭 이벤트 핸들러에서 스페이스바 이벤트에 에러가 발생하게 된다.(player를 받기 때문)  (사진 5번)
+    오류를 해결하기 위해서는 new Bubble(mContext)로 받아야 하는데 mContext가 BubbleFrame 본인이기 때문에 this로 받아오면 된다.
+    하지만, 단순히 this로 받게 되면 다시 한번 에러가 발생하게 된다. 
+    그 이유는 이 상황에서 받게 되는 this는 new KeyAdapter() 안에서의 this를 뜻하기 때문이다.
+
+    즉, BubbleFrame에서도 mContext로 정의한 후, 이것을 this로 받아야 한다.  (사진 6,7번)
+
+3. 위 코드가 완성되면 다시 Bubble 클래스로 돌아가 bomb 이미지로 변경된 후, 0.5초 뒤에 메모리에서 소멸시킨다.       (사진 8번)
+    하지만 인게임으로 들어가보면 bomb 이미지가 사라지지 않는 것을 확인할 수 있다.
+    코드에 따르면 메모리에서 bubble이 소멸된 것은 확실하지만, 화면에서는 사라지지 않고 남아있는 것이다.
+    즉, reprint()를 사용하여 화면을 다시 그려야 한다.(reprint()를 사용하게 되면 메모리에 존재하는 이미지만 그려 넣는다.)    (사진 9번)
