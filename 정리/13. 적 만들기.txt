@@ -1,0 +1,70 @@
+1. 적을 만들기 위해서 Enemy 클래스를 생성하고(이때, Enemy는 Player 클래스와 똑같지만, attact과 같은 기능을 제거), enemy의 방향을 알기 우해 EnemyDirection enum을 생성한다.  (사진 1번)
+    Enemy 클래스를 생성했으면 인게임에서 나오게 만들기 위해 BubbleFrame 클래스에서 Enemy 클래스를 호출하여(사진 2번)
+    레이아웃에 add()를 한다     (사진 3번)
+
+2. 위 과정은 인게임에서 enemy를 볼 수 있게 해주는 것이고, bubble에 닿았을 때, 진행되는 사항도 코드로 작성해야한다.
+    만약, enemy가 bubble의 정보를 가져오게 된다면, 수십, 수백개의 bubble이 생성되었을 때, enemy는 수십, 수백 개의 bubble의 정보를 for 구문으로 돌리면서 판단을 해야한다.
+    반면에 bubble이 enemy의 정보를 가져오게 된다면, bubble 하나 당, 1개의 스레드를 가지고 있기 때문에 enemy의 정보를 가져오는 코드도 심플하게 작성할 수 있게 된다.
+
+    즉, bubble이 enemy에 충돌하게 되는 순간, bubble, enemy의 위치 정보를 가지고 충돌을 판단할 수 있으면 된다.
+    이를 위해서 먼저 Bubble 클래스에 Enemy를 사용할 수 있도록 호출한다.     (사진 3번) -> bubble이 enemy를 계산
+
+    bubble이 날아가는 과정에서 bubble의 좌표와 enemy의 좌표가 겹치게 되면 attack 메서드가 실행되게 한다.    (사진 4번)
+    이때, attack 메서드는 Player 클래스에서 정해진 메서드를 사용하는 것이 아닌, 현재 Bubble 클래스에서 새롭게 정의하여 사용하는 것을 말한다.    (사진 5번)
+    실제 java를 실행해보면 bubble이 enemy를 만나는 순간 bubbled 이미지로 변경되는 것을 확인할 수 있다.      (사진 7번)
+
+3. bubble이 enemy를 맞추는 순간, enemy가 사라지게 하는 방법은 attack() 메소드가 실행되는 순간 remove로 없애주면 된다.(repaint 사용)       (사진 8,9번)
+    추가로 enemy를 가둔 bubble은 비어있는 bubble 보다 천천히 올라갈 수 있도록 if 문을 작성한다.     (사진 10번)
+    또한, enemy를 가둔 순간 bubble이 up을 해야하므로 break를 추가한다.      (사진 11번)
+
+    하지만, 코드 상에서 문제가 없어보이나 실제 java를 실행해보면 enemy를 bubble로 가둔 순간, enemy의 모습은 사라지는데 사라진 그 자리에 다시 공격을 하게되면 enemy가 존재하는 것으로 인식하게 된다.
+    그 이유는 remove()로 사라진 enemy는 가비지 컬렉션이 되는데 이런 가비지 컬렉션은 즉시 동작하지 않는다.
+
+    즉시 동작하게 만들기 위해서는 가비지 컬렉션으로 처리하는 것이 아니라 enemy의 상태를 주고, 그 상태에 맞게 동작하도록 코드를 작성하면 된다.
+    먼저, Enemy 클래스에서 살아있는 상태(0)와 갇혀있는 상태(1)를 부여한다.      (사진 12,13번)
+
+    Bubble 클래스로 돌아가 enemy가 살아있는 상태에만 attack이 동작하도록 if 구문을 추가한다.        (사진 14번)
+    이때, attack이 실해되면 enemy의 상태를 1로 변경해준다.      (사진 15번)
+
+
+    하지만, 이렇게 코드를 작성해도 bubble의 이미지만 정상적으로 작동하지 아직 enemy가 존재하던 위치에 남아있는 것으로 프로그램이 인식하고 있다.
+    그 이유는 if 문을 만들었을 때, 중괄호를 사용하지 않았았기에 break가 정상작동하지 않았기 때문이다.           (사진 16번) 
+
+4. 이제는 player가 bubbled(enemy가 갇힌 bubble)에 부딪힐 경우 bubbled가 터지도록 코드를 작성해야한다.
+    코드는 player를 계속 바라보고 있다가 bubbled에 부딪힐 경우 진행하게 만들어야하므로 BackgroundPlayerService 클래스에서 작성되어야 한다.
+    이때, bubble은 한 개가 아닌 수십 개로 존재하기 때문에 List로 받아온다.          (사진 17번)
+    (현재는 getBubbleList()로 불러와도 getBubbleList가 존재하지 않기 때문에 오류가 발생한다.)
+
+    BubbleList를 만들기 위해 Player 클래스로 돌아와 List 형식의 Bubble을 선언하고, initObject에 ArrayList<>를 사용한다.     (사진 18,19번)
+    (List의 부모가 ArrayList이다.)
+
+    attack이 실행되면 Bubble을 생성하고, bubbleList 안에 bubble을 넣어준다.     (사진 20번)
+    이렇게 하게 되면 BackgroundPlayerService 클래스에서 bubbleList를 사용할 수 있게 된다.
+
+5. player가 bubbled에 충돌하는 코드는 이전 벽에 충돌하는 코드와 같이 while 구문 안에 작성해야한다.      (사진 21번)
+    하지만 java를 실행하게 될 경우 오류가 발생한다. 그 이유는 중간에 BackgroundPlayerService 클래스에서 받아오게 되는 파라미터를 BubbleFrame_2 mContext로 변경했기 때문이다.
+    기존에는 BubbleFrame_2 mContext 대신 Player player로 받아와 player가 존재하는 상황에서 BubbleFrame 클래스의 initObject에 player가 생성되어 mContext를 받아오게 됐는데
+    BubbleFrame_2 mContext으로 변경되면서 player가 생성되기 전에 mContext를 받아오기 때문에 player가 null인 상태가 된 것이다.       (사진 23,23번)
+    (이때, Player 클래스의 initBackgroundPlayerService() 메서드에서도 mContext가 아닌 this로 받아와야 한다. (사진 24번))
+
+    이제 코드를 실행해보면 player가 bubbled에 접촉하게 되면 sysout에 적힌 내용이 출력되는 것을 확인할 수 있다.
+
+6. player가 bubbled에 닿으면 bomb 이미지로 변경되고, 시간이 지난 후, repaint가 되야하므로 Bubble 클래스에 cleanBubbled 메서드를 생성하여 player가 bubbled에 접촉할 경우 실행될 함수를 생성  (사진 25번)
+    이때, cleanBubbled는 Bubble 클래스에서 사용되는 것이 아닌, BackgroundPlayerService에서 동작하는 것이므로 private가 아닌 public이 되야한다.
+
+    BackgroundPlayerService에서 cleanBubbled를 사용할 때는 먼저 Bubble을 불러와 사용하기 좋게 정의하고, bubble.cleanBubbled()로 불러온다.       (사진 26번)
+
+    하지만 위 코드를 실행해보면 cleanBubbled가 실행되는 순간 오류가 발생한다.
+    그 이유는 while 구문 안에 버블 충돌 확인 기능과 벽 충돌 확인 기능이 존재하는데 버블 충돌을 확인하는 순간 벽 충돌은 확인하지 못하기 때문이다.
+    (cleanBubbled가 실행되면서 repaint()도 진행되고, 그림이 다시 그려지며 인식할 수 있는 것들이 사라진다.)
+
+    이 문제를 해결하는 방법이 스레드를 사용하는 것이고, BackgroundPlayerService의 while 구문 안(정확히는 while 구문 안의 버블 충돌 확인을 위한 for 구문 안)에서 스레드를 생성하면 된다.
+    이 방법도 문제없이 동작하지만, 코드를 더 깔끔하게 만들기 위해서는 Bubble 클래스의 cleanBubbled 메소드에서 스레드를 만드는 것이 좋다.        (사진 27번)
+
+    쉽게 말해, repaint()가 진행되어야 한다면 스레드에 담아서 진행되어야 한다는 뜻이다.
+
+        하지만 이전에 만들었던 cleanBubble 메서드를 살펴보면 스레드를 만들지 않는 상태에서 repaint()가 실행되는 것을 볼 수 있다.
+        이 경우에 오류가 발생하지 않는 이유는 
+            cleanBubble은 bubble 자체가 Bubble에 의해서 지워지는 것이지만, 
+            cleanBubbled는 bubble이 player에 의해서 지워지기 때문이다.
+            (물론, 둘 다 스레드로 돌려도 상관없다.)
